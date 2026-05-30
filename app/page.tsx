@@ -40,7 +40,7 @@ export default function Home() {
     <>
       <Nav links={NAV_LINKS} />
 
-      <main className="min-h-[calc(100vh-54px)] flex items-center justify-center px-4 py-12">
+      <main className="min-h-[calc(100vh-54px)] flex items-center justify-center px-4">
         <div className="w-full max-w-[460px] bg-white border border-light">
 
           {/* Card header */}
