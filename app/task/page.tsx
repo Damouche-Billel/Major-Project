@@ -28,10 +28,10 @@ const COLOUR_IMAGES: Record<string, [string, string, string]> = {
 }
 
 const TASKS: TaskMeta[] = [
-  { number: 1, label: 'Task 1', instruction: 'Find a size Medium in Black and add it to your basket.' },
-  { number: 2, label: 'Task 2', instruction: 'Check whether this item has free returns.' },
-  { number: 3, label: 'Task 3', instruction: 'Save the item to your wishlist.' },
-  { number: 4, label: 'Task 4', instruction: 'Navigate to the Contact page.' },
+  { number: 1, label: 'Task 1', instruction: 'You want to buy this item as a gift. Select size Medium in Stone and add it to your basket.' },
+  { number: 2, label: 'Task 2', instruction: 'You want to check if free returns are available and find out exactly how many days you have to return the item.' },
+  { number: 3, label: 'Task 3', instruction: 'You have changed your mind about buying now. Save the item to your wishlist for later.' },
+  { number: 4, label: 'Task 4', instruction: 'You have a question about the item. Navigate to the Contact page to get in touch with the brand.' },
 ]
 
 const TOTAL_TASKS = TASKS.length
@@ -53,8 +53,9 @@ function TaskPageInner() {
   const [elapsed, setElapsed] = useState<number>(0)
   const [activeThumb, setActiveThumb] = useState<number>(0)
   const [selectedColour, setSelectedColour] = useState<string>('Black')
-  const [selectedSize, setSelectedSize] = useState<string>('M')
+  const [selectedSize, setSelectedSize] = useState<string>('')
   const [taskCompleteVisible, setTaskCompleteVisible] = useState<boolean>(false)
+  const [basketError, setBasketError] = useState<boolean>(false)
   const [sessionData, setSessionData] = useState<SessionData>({
     variant,
     task1Start: null,
@@ -111,10 +112,12 @@ function TaskPageInner() {
   function handleAddToBasket() {
     track()
     if (currentTask !== 1) return
-    if (selectedColour !== 'Black' || selectedSize !== 'M') {
+    if (selectedColour !== 'Stone' || selectedSize !== 'M') {
       setSessionData((prev) => ({ ...prev, errorClicks: prev.errorClicks + 1 }))
+      setBasketError(true)
       return
     }
+    setBasketError(false)
     advanceTask(1)
   }
 
@@ -339,7 +342,7 @@ function TaskPageInner() {
               <p className="font-sans text-[11px] uppercase tracking-wider text-mid mb-2">Size</p>
               <div className="flex gap-2">
                 {(['XS', 'S', 'M', 'L', 'XL'] as string[]).map((size) => {
-                  const disabled = size === 'XS'
+                  const disabled = size === 'XS' || size === 'XL'
                   const active = selectedSize === size
                   return (
                     <button
@@ -366,10 +369,15 @@ function TaskPageInner() {
             {/* Add to basket */}
             <button
               onClick={handleAddToBasket}
-              className="w-full bg-dark text-white font-sans text-[11px] uppercase tracking-[0.15em] py-3.5 hover:bg-accent transition-colors mb-3"
+              className="w-full bg-dark text-white font-sans text-[11px] uppercase tracking-[0.15em] py-3.5 hover:bg-accent transition-colors mb-2"
             >
               Add to basket
             </button>
+            {basketError && (
+              <p className="font-sans text-[11px] text-brand-red tracking-wide mb-3">
+                Please check your colour and size selection.
+              </p>
+            )}
 
             {/* Save to wishlist */}
             <button
