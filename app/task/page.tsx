@@ -28,10 +28,10 @@ const COLOUR_IMAGES: Record<string, [string, string, string]> = {
 }
 
 const TASKS: TaskMeta[] = [
-  { number: 1, label: 'Task 1', instruction: 'You want to buy this item as a gift. Select size Medium in Stone and add it to your basket.' },
-  { number: 2, label: 'Task 2', instruction: 'You want to check if free returns are available and find out exactly how many days you have to return the item.' },
-  { number: 3, label: 'Task 3', instruction: 'You have changed your mind about buying now. Save the item to your wishlist for later.' },
-  { number: 4, label: 'Task 4', instruction: 'You have a question about the item. Navigate to the Contact page to get in touch with the brand.' },
+  { number: 1, label: 'Task 1', instruction: 'Find out if this item can be gift wrapped and how much it costs.' },
+  { number: 2, label: 'Task 2', instruction: 'Find the exact number of days you have to return a sale item.' },
+  { number: 3, label: 'Task 3', instruction: 'Find out what size the model is wearing and what size she recommends for an oversized fit.' },
+  { number: 4, label: 'Task 4', instruction: 'Select size Medium in Stone and add it to your basket.' },
 ]
 
 const TOTAL_TASKS = TASKS.length
@@ -55,6 +55,7 @@ function TaskPageInner() {
   const [selectedColour, setSelectedColour] = useState<string>('Black')
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [taskCompleteVisible, setTaskCompleteVisible] = useState<boolean>(false)
+  const [allDone, setAllDone] = useState<boolean>(false)
   const [basketError, setBasketError] = useState<boolean>(false)
   const [openSections, setOpenSections] = useState<Set<string>>(new Set())
   const [openFaqs, setOpenFaqs] = useState<Set<number>>(new Set())
@@ -100,32 +101,53 @@ function TaskPageInner() {
   function advanceTask(completedTask: number) {
     const now = Date.now()
     const endKey = `task${completedTask}End` as keyof SessionData
-    const startKey = `task${completedTask + 1}Start` as keyof SessionData
-    setSessionData((prev) => {
-      const updated = { ...prev, [endKey]: now, [startKey]: now }
-      sessionStorage.setItem('sessionData', JSON.stringify(updated))
-      return updated
-    })
-    setCurrentTask(completedTask + 1)
-    setTaskCompleteVisible(true)
+    if (completedTask === TOTAL_TASKS) {
+      setSessionData((prev) => {
+        const updated = { ...prev, [endKey]: now }
+        sessionStorage.setItem('sessionData', JSON.stringify(updated))
+        return updated
+      })
+      setAllDone(true)
+    } else {
+      const startKey = `task${completedTask + 1}Start` as keyof SessionData
+      setSessionData((prev) => {
+        const updated = { ...prev, [endKey]: now, [startKey]: now }
+        sessionStorage.setItem('sessionData', JSON.stringify(updated))
+        return updated
+      })
+      setCurrentTask(completedTask + 1)
+      setTaskCompleteVisible(true)
+    }
+  }
+
+  function handleGiftWrapClick() {
+    if (currentTask !== 1) return
+    track()
+    advanceTask(1)
+  }
+
+  function handleSaleReturnClick() {
+    if (currentTask !== 2) return
+    track()
+    advanceTask(2)
+  }
+
+  function handleModelSizingClick() {
+    if (currentTask !== 3) return
+    track()
+    advanceTask(3)
   }
 
   function handleAddToBasket() {
     track()
-    if (currentTask !== 1) return
+    if (currentTask !== 4) return
     if (selectedColour !== 'Stone' || selectedSize !== 'M') {
       setSessionData((prev) => ({ ...prev, errorClicks: prev.errorClicks + 1 }))
       setBasketError(true)
       return
     }
     setBasketError(false)
-    advanceTask(1)
-  }
-
-  function handleFreeReturnsClick() {
-    if (currentTask !== 2) return
-    track()
-    advanceTask(2)
+    advanceTask(4)
   }
 
   function handleNextTask() {
@@ -150,18 +172,7 @@ function TaskPageInner() {
   }
 
   function handleSaveToWishlist() {
-    if (currentTask !== 3) {
-      track()
-      return
-    }
-    const now = Date.now()
-    const updated: SessionData = {
-      ...sessionData,
-      task3End: now,
-      totalClicks: sessionData.totalClicks + 1,
-    }
-    sessionStorage.setItem('sessionData', JSON.stringify(updated))
-    router.push(`/wishlist?variant=${variant}`)
+    track()
   }
 
   // ── Effects ───────────────────────────────────────────────
@@ -200,8 +211,8 @@ function TaskPageInner() {
         {/* Task progress bar */}
         <div className="flex w-full h-[3px] flex-shrink-0">
           {TASKS.map((t) => {
-            const isCompleted = t.number < currentTask
-            const isActive = t.number === currentTask
+            const isCompleted = allDone || t.number < currentTask
+            const isActive = !allDone && t.number === currentTask
             return (
               <div
                 key={t.number}
@@ -213,30 +224,32 @@ function TaskPageInner() {
           })}
         </div>
 
-        {/* Task banner */}
-        <div className="w-full bg-dark flex items-stretch min-h-[72px] flex-shrink-0">
-          <div className="flex-1 flex flex-col justify-center px-8 py-4 border-r border-white/10">
-            <span className="font-sans text-[10px] uppercase tracking-[0.18em] text-white/40 mb-1">
-              Task {currentTask} of {TOTAL_TASKS}
-            </span>
-            <p className="font-serif italic text-[18px] font-light text-white leading-snug">
-              {task.instruction}
-            </p>
-          </div>
-          <div className="flex items-center justify-center px-8">
-            <div className="flex items-center gap-2 border border-white/20 px-4 py-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+        {/* Task banner — hidden when all tasks complete */}
+        {!allDone && (
+          <div className="w-full bg-dark flex items-stretch min-h-[72px] flex-shrink-0">
+            <div className="flex-1 flex flex-col justify-center px-8 py-4 border-r border-white/10">
+              <span className="font-sans text-[10px] uppercase tracking-[0.18em] text-white/40 mb-1">
+                Task {currentTask} of {TOTAL_TASKS}
               </span>
-              <span className="font-sans text-[13px] tracking-[0.12em] text-white tabular-nums">
-                {formatElapsed(elapsed)}
-              </span>
+              <p className="font-serif italic text-[18px] font-light text-white leading-snug">
+                {task.instruction}
+              </p>
+            </div>
+            <div className="flex items-center justify-center px-8">
+              <div className="flex items-center gap-2 border border-white/20 px-4 py-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+                </span>
+                <span className="font-sans text-[13px] tracking-[0.12em] text-white tabular-nums">
+                  {formatElapsed(elapsed)}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Task complete bar */}
+        {/* Task complete bar (tasks 1–3) */}
         {taskCompleteVisible && (
           <div className="w-full bg-brand-green flex items-center justify-between px-8 py-3 flex-shrink-0">
             <span className="font-sans text-[12px] uppercase tracking-[0.12em] text-white">
@@ -247,6 +260,21 @@ function TaskPageInner() {
               className="font-sans text-[11px] uppercase tracking-[0.12em] text-white border border-white/40 px-4 py-1.5 hover:bg-white/10 transition-colors"
             >
               Next task
+            </button>
+          </div>
+        )}
+
+        {/* All tasks complete bar */}
+        {allDone && (
+          <div className="w-full bg-brand-green flex items-center justify-between px-8 py-3 flex-shrink-0">
+            <span className="font-sans text-[12px] uppercase tracking-[0.12em] text-white">
+              ✓&nbsp;&nbsp;All tasks complete
+            </span>
+            <button
+              onClick={() => router.push('/survey')}
+              className="font-sans text-[11px] uppercase tracking-[0.12em] text-white border border-white/40 px-4 py-1.5 hover:bg-white/10 transition-colors"
+            >
+              Go to survey
             </button>
           </div>
         )}
@@ -393,7 +421,7 @@ function TaskPageInner() {
             </button>
             {basketError && (
               <p className="font-sans text-[11px] text-brand-red tracking-wide mb-3">
-                Please check your colour and size selection.
+                Please select Stone and size Medium before adding to basket.
               </p>
             )}
 
@@ -410,10 +438,7 @@ function TaskPageInner() {
               <p className="font-sans text-[12px] text-mid leading-relaxed">
                 100% organic cotton. Relaxed oversized fit. Model is 5ft 10 wearing size S.
                 Machine wash cold.{' '}
-                <span
-                  onClick={handleFreeReturnsClick}
-                  className={`text-brand-green ${currentTask === 2 ? 'cursor-pointer underline underline-offset-2' : ''}`}
-                >
+                <span className="text-brand-green">
                   Free returns within 30 days.
                 </span>
               </p>
@@ -436,7 +461,10 @@ function TaskPageInner() {
                     <div className="pb-5 flex flex-col gap-3">
                       <p className="font-sans text-[12px] text-mid leading-relaxed">Our Classic Oversized Tee is cut from 180gsm organic cotton jersey, pre-washed for softness and minimal shrinkage. The dropped shoulders and relaxed body create an effortlessly oversized silhouette that works equally well tucked or untucked.</p>
                       <p className="font-sans text-[12px] text-mid leading-relaxed">Fabric composition is 100% GOTS-certified organic cotton. The fabric is mid-weight, breathable and gets softer with every wash. Garment dyed for a lived-in finish.</p>
-                      <p className="font-sans text-[12px] text-mid leading-relaxed">Model is 5ft 10 and wears a size Small. For an oversized fit as shown, we recommend sizing up one size. If you prefer a closer fit, select your usual size.</p>
+                      <p
+                        onClick={handleModelSizingClick}
+                        className={`font-sans text-[12px] text-mid leading-relaxed ${currentTask === 3 ? 'cursor-pointer underline underline-offset-2' : ''}`}
+                      >Model is 5ft 10 and wears a size Small. For an oversized fit as shown, we recommend sizing up one size. If you prefer a closer fit, select your usual size.</p>
                     </div>
                   </div>
                 </div>
@@ -458,7 +486,11 @@ function TaskPageInner() {
                       <p className="font-sans text-[12px] text-mid leading-relaxed">Express delivery — 1–2 working days — £6.99</p>
                       <p className="font-sans text-[12px] text-mid leading-relaxed">Free standard delivery on orders over £75.</p>
                       <hr className="border-light my-1" />
-                      <p className="font-sans text-[12px] text-mid leading-relaxed">Items can be returned within <span className="text-dark">30 days</span> of delivery in original condition with tags attached. Sale items can be returned within 14 days.</p>
+                      <p className="font-sans text-[12px] text-mid leading-relaxed">Items can be returned within <span className="text-dark font-medium">30 days</span> of delivery in original condition with tags attached.</p>
+                      <p
+                        onClick={handleSaleReturnClick}
+                        className={`font-sans text-[12px] text-mid leading-relaxed ${currentTask === 2 ? 'cursor-pointer underline underline-offset-2' : ''}`}
+                      >Sale items can be returned within <span className="text-dark font-medium">14 days</span>.</p>
                       <p className="font-sans text-[12px] text-mid leading-relaxed">To start a return visit our returns portal or email{' '}<a href="mailto:returns@minimalist.com" className="text-dark underline underline-offset-2">returns@minimalist.com</a>. Exchanges are subject to availability.</p>
                     </div>
                   </div>
@@ -545,7 +577,7 @@ function TaskPageInner() {
                       ] as { q: string; a: string }[]).map((item, i) => (
                         <div key={i} className="border-t border-light">
                           <button
-                            onClick={() => toggleFaq(i)}
+                            onClick={() => { toggleFaq(i); if (i === 2) handleGiftWrapClick() }}
                             className="w-full flex items-start justify-between py-3 text-left"
                           >
                             <span className="font-sans text-[12px] text-mid pr-4 leading-snug">{item.q}</span>
