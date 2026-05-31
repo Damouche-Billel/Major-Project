@@ -107,7 +107,6 @@ function TaskPageInner() {
       return updated
     })
     setCurrentTask(completedTask + 1)
-    setTaskStartTime(new Date(now))
     setTaskCompleteVisible(true)
   }
 
@@ -131,6 +130,7 @@ function TaskPageInner() {
 
   function handleNextTask() {
     setTaskCompleteVisible(false)
+    setTaskStartTime(new Date())
   }
 
   function toggleSection(key: string) {
