@@ -56,6 +56,8 @@ function TaskPageInner() {
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [taskCompleteVisible, setTaskCompleteVisible] = useState<boolean>(false)
   const [basketError, setBasketError] = useState<boolean>(false)
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set())
+  const [openFaqs, setOpenFaqs] = useState<Set<number>>(new Set())
   const [sessionData, setSessionData] = useState<SessionData>({
     variant,
     task1Start: null,
@@ -129,6 +131,22 @@ function TaskPageInner() {
 
   function handleNextTask() {
     setTaskCompleteVisible(false)
+  }
+
+  function toggleSection(key: string) {
+    setOpenSections((prev) => {
+      const next = new Set(prev)
+      next.has(key) ? next.delete(key) : next.add(key)
+      return next
+    })
+  }
+
+  function toggleFaq(i: number) {
+    setOpenFaqs((prev) => {
+      const next = new Set(prev)
+      next.has(i) ? next.delete(i) : next.add(i)
+      return next
+    })
   }
 
   function handleSaveToWishlist() {
@@ -387,8 +405,8 @@ function TaskPageInner() {
               Save to wishlist
             </button>
 
-            {/* Description */}
-            <div className="bg-lighter p-4">
+            {/* Description — quick summary strip */}
+            <div className="bg-lighter p-4 mb-1">
               <p className="font-sans text-[12px] text-mid leading-relaxed">
                 100% organic cotton. Relaxed oversized fit. Model is 5ft 10 wearing size S.
                 Machine wash cold.{' '}
@@ -399,6 +417,173 @@ function TaskPageInner() {
                   Free returns within 30 days.
                 </span>
               </p>
+            </div>
+
+            {/* ── Accordion sections ── */}
+            <div className="border-t border-light mt-4">
+
+              {/* 1 — Product details */}
+              <div className="border-b border-light">
+                <button
+                  onClick={() => toggleSection('details')}
+                  className="w-full flex items-center justify-between py-3.5 font-sans text-[11px] uppercase tracking-[0.12em] text-mid hover:text-dark transition-colors"
+                >
+                  <span>Product details</span>
+                  <span className="text-[18px] leading-none select-none">{openSections.has('details') ? '−' : '+'}</span>
+                </button>
+                <div style={{ display: 'grid', gridTemplateRows: openSections.has('details') ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease' }}>
+                  <div style={{ overflow: 'hidden' }}>
+                    <div className="pb-5 flex flex-col gap-3">
+                      <p className="font-sans text-[12px] text-mid leading-relaxed">Our Classic Oversized Tee is cut from 180gsm organic cotton jersey, pre-washed for softness and minimal shrinkage. The dropped shoulders and relaxed body create an effortlessly oversized silhouette that works equally well tucked or untucked.</p>
+                      <p className="font-sans text-[12px] text-mid leading-relaxed">Fabric composition is 100% GOTS-certified organic cotton. The fabric is mid-weight, breathable and gets softer with every wash. Garment dyed for a lived-in finish.</p>
+                      <p className="font-sans text-[12px] text-mid leading-relaxed">Model is 5ft 10 and wears a size Small. For an oversized fit as shown, we recommend sizing up one size. If you prefer a closer fit, select your usual size.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2 — Delivery and returns */}
+              <div className="border-b border-light">
+                <button
+                  onClick={() => toggleSection('delivery')}
+                  className="w-full flex items-center justify-between py-3.5 font-sans text-[11px] uppercase tracking-[0.12em] text-mid hover:text-dark transition-colors"
+                >
+                  <span>Delivery and returns</span>
+                  <span className="text-[18px] leading-none select-none">{openSections.has('delivery') ? '−' : '+'}</span>
+                </button>
+                <div style={{ display: 'grid', gridTemplateRows: openSections.has('delivery') ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease' }}>
+                  <div style={{ overflow: 'hidden' }}>
+                    <div className="pb-5 flex flex-col gap-2">
+                      <p className="font-sans text-[12px] text-mid leading-relaxed">Standard delivery — 3–5 working days — £3.99</p>
+                      <p className="font-sans text-[12px] text-mid leading-relaxed">Express delivery — 1–2 working days — £6.99</p>
+                      <p className="font-sans text-[12px] text-mid leading-relaxed">Free standard delivery on orders over £75.</p>
+                      <hr className="border-light my-1" />
+                      <p className="font-sans text-[12px] text-mid leading-relaxed">Items can be returned within <span className="text-dark">30 days</span> of delivery in original condition with tags attached. Sale items can be returned within 14 days.</p>
+                      <p className="font-sans text-[12px] text-mid leading-relaxed">To start a return visit our returns portal or email{' '}<a href="mailto:returns@minimalist.com" className="text-dark underline underline-offset-2">returns@minimalist.com</a>. Exchanges are subject to availability.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3 — Size guide */}
+              <div className="border-b border-light">
+                <button
+                  onClick={() => toggleSection('sizeguide')}
+                  className="w-full flex items-center justify-between py-3.5 font-sans text-[11px] uppercase tracking-[0.12em] text-mid hover:text-dark transition-colors"
+                >
+                  <span>Size guide</span>
+                  <span className="text-[18px] leading-none select-none">{openSections.has('sizeguide') ? '−' : '+'}</span>
+                </button>
+                <div style={{ display: 'grid', gridTemplateRows: openSections.has('sizeguide') ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease' }}>
+                  <div style={{ overflow: 'hidden' }}>
+                    <div className="pb-5">
+                      <table className="w-full mb-3" style={{ borderCollapse: 'collapse' }}>
+                        <thead>
+                          <tr>
+                            {['Size', 'Chest cm', 'Length cm', 'Sleeve cm'].map((h) => (
+                              <th key={h} className="font-sans text-[10px] uppercase tracking-[0.1em] text-mid text-left py-2 border-b border-light pr-4">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(['XS,88,68,58', 'S,92,70,59', 'M,96,72,60', 'L,100,74,61', 'XL,104,76,62'] as string[]).map((row) => {
+                            const [size, chest, length, sleeve] = row.split(',')
+                            return (
+                              <tr key={size} className="border-b border-light last:border-b-0">
+                                <td className="font-sans text-[12px] text-dark py-2 pr-4">{size}</td>
+                                <td className="font-sans text-[12px] text-mid py-2 pr-4">{chest}</td>
+                                <td className="font-sans text-[12px] text-mid py-2 pr-4">{length}</td>
+                                <td className="font-sans text-[12px] text-mid py-2">{sleeve}</td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                      <p className="font-sans text-[11px] text-mid leading-relaxed italic">All measurements are of the garment laid flat. We recommend measuring a well-fitting item and comparing.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4 — Care */}
+              <div className="border-b border-light">
+                <button
+                  onClick={() => toggleSection('care')}
+                  className="w-full flex items-center justify-between py-3.5 font-sans text-[11px] uppercase tracking-[0.12em] text-mid hover:text-dark transition-colors"
+                >
+                  <span>Care</span>
+                  <span className="text-[18px] leading-none select-none">{openSections.has('care') ? '−' : '+'}</span>
+                </button>
+                <div style={{ display: 'grid', gridTemplateRows: openSections.has('care') ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease' }}>
+                  <div style={{ overflow: 'hidden' }}>
+                    <div className="pb-5 flex flex-col gap-1.5">
+                      {['Machine wash at 30°C.', 'Do not tumble dry.', 'Reshape whilst damp and dry flat.', 'Cool iron if needed.', 'Do not dry clean.', 'Wash dark colours separately for first few washes.'].map((line) => (
+                        <p key={line} className="font-sans text-[12px] text-mid leading-relaxed">— {line}</p>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 5 — FAQ */}
+              <div className="border-b border-light">
+                <button
+                  onClick={() => toggleSection('faq')}
+                  className="w-full flex items-center justify-between py-3.5 font-sans text-[11px] uppercase tracking-[0.12em] text-mid hover:text-dark transition-colors"
+                >
+                  <span>Frequently asked questions</span>
+                  <span className="text-[18px] leading-none select-none">{openSections.has('faq') ? '−' : '+'}</span>
+                </button>
+                <div style={{ display: 'grid', gridTemplateRows: openSections.has('faq') ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease' }}>
+                  <div style={{ overflow: 'hidden' }}>
+                    <div className="pb-3">
+                      {([
+                        { q: 'Does this item run true to size?', a: 'This tee is intentionally oversized. If you prefer the look shown on the model, select your true size. For a more relaxed fit, size up.' },
+                        { q: 'Is this item available in plus sizes?', a: 'We currently stock up to XL. We are working on extending our size range and hope to have XXL and XXXL available later this year.' },
+                        { q: 'Can I get this gift wrapped?', a: 'Yes, we offer gift wrapping for £3.50 per item. Select the gift wrap option at checkout and add a personal message.' },
+                        { q: 'Is the packaging sustainable?', a: 'All our packaging is plastic free. Orders are shipped in recycled cardboard boxes with tissue paper made from FSC certified sources.' },
+                      ] as { q: string; a: string }[]).map((item, i) => (
+                        <div key={i} className="border-t border-light">
+                          <button
+                            onClick={() => toggleFaq(i)}
+                            className="w-full flex items-start justify-between py-3 text-left"
+                          >
+                            <span className="font-sans text-[12px] text-mid pr-4 leading-snug">{item.q}</span>
+                            <span className="font-sans text-[16px] leading-none select-none text-mid flex-shrink-0 mt-0.5">{openFaqs.has(i) ? '−' : '+'}</span>
+                          </button>
+                          <div style={{ display: 'grid', gridTemplateRows: openFaqs.has(i) ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease' }}>
+                            <div style={{ overflow: 'hidden' }}>
+                              <p className="font-sans text-[12px] text-mid leading-relaxed pb-3 pr-6">{item.a}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* ── You may also like ── */}
+            <div className="mt-8 pb-8">
+              <p className="font-sans text-[10px] uppercase tracking-[0.18em] text-mid mb-4">You may also like</p>
+              <div className="grid grid-cols-2 gap-3">
+                {([
+                  { name: 'Classic Crew Neck Sweatshirt', price: '£65.00' },
+                  { name: 'Relaxed Fit Chino',            price: '£85.00' },
+                  { name: 'Organic Cotton Hoodie',        price: '£95.00' },
+                  { name: 'Wide Leg Trouser',             price: '£75.00' },
+                ] as { name: string; price: string }[]).map((p) => (
+                  <div key={p.name} className="border border-light cursor-pointer group">
+                    <div className="w-full flex items-center justify-center" style={{ height: '120px', backgroundColor: '#E8E2D9' }} />
+                    <div className="p-3">
+                      <p className="font-serif text-[14px] font-light text-dark leading-snug mb-1 group-hover:text-accent transition-colors">{p.name}</p>
+                      <p className="font-sans text-[12px] text-mid">{p.price}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
           </div>
