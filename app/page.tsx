@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Nav from '@/components/Nav'
 
 interface ParticipantData {
@@ -18,7 +18,17 @@ const NAV_LINKS = [
 ]
 
 export default function Home() {
+  return (
+    <Suspense>
+      <HomeInner />
+    </Suspense>
+  )
+}
+
+function HomeInner() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const variant = searchParams.get('variant') ?? 'a'
   const [data, setData] = useState<ParticipantData>({
     participantId: '',
     ageRange: '',
@@ -33,7 +43,7 @@ export default function Home() {
 
   function handleContinue() {
     localStorage.setItem('participantData', JSON.stringify(data))
-    router.push('/task')
+    router.push(`/task?variant=${variant}`)
   }
 
   return (

@@ -36,6 +36,51 @@ const TASKS: TaskMeta[] = [
 
 const TOTAL_TASKS = TASKS.length
 
+const COLOURS = [
+  { name: 'Black', hex: '#191917' },
+  { name: 'Stone', hex: '#C8C4BA' },
+  { name: 'Sage',  hex: '#8AB87A' },
+  { name: 'Sky',   hex: '#7AAAD4' },
+]
+
+const SIZES = ['XS', 'S', 'M', 'L', 'XL']
+
+const RATING_BARS = [
+  { label: '5 ★', pct: 62 },
+  { label: '4 ★', pct: 22 },
+  { label: '3 ★', pct: 10 },
+  { label: '2 ★', pct: 4 },
+  { label: '1 ★', pct: 2 },
+]
+
+const REVIEWS = [
+  {
+    name: 'Sophie R.',
+    stars: 5,
+    verified: true,
+    title: 'Perfect everyday tee',
+    body: "I bought this in both Black and Stone and I wear them constantly. The fabric feels incredibly soft and substantial — not like the thin oversized tees you usually find. After six washes it hasn't shrunk or lost its shape at all. Truly worth every penny and I'm already considering the Sage colourway.",
+    helpful: 43,
+    date: '12 May 2025',
+  },
+  {
+    name: 'Marcus T.',
+    stars: 4,
+    verified: true,
+    title: 'Great quality, slightly long',
+    body: "Really impressed with the fabric weight and construction. The stitching is clean and the colour hasn't faded after repeated washing. My only note is that the length is quite long even for an oversized style, so if you're on the shorter side you may want to size down. Overall a solid, versatile basic.",
+    helpful: 18,
+    date: '3 June 2025',
+  },
+]
+
+const RELATED_PRODUCTS = [
+  { name: 'Classic Crew Neck Sweatshirt', price: '£65.00' },
+  { name: 'Relaxed Fit Chino',            price: '£85.00' },
+  { name: 'Organic Cotton Hoodie',        price: '£95.00' },
+  { name: 'Wide Leg Trouser',             price: '£75.00' },
+]
+
 function formatElapsed(seconds: number): string {
   const m = Math.floor(seconds / 60)
   const s = seconds % 60
@@ -57,8 +102,12 @@ function TaskPageInner() {
   const [taskCompleteVisible, setTaskCompleteVisible] = useState<boolean>(false)
   const [allDone, setAllDone] = useState<boolean>(false)
   const [basketError, setBasketError] = useState<boolean>(false)
-  const [openSections, setOpenSections] = useState<Set<string>>(new Set())
-  const [openFaqs, setOpenFaqs] = useState<Set<number>>(new Set())
+  const [openSections, setOpenSections] = useState<Set<string>>(
+    variant === 'b' ? new Set(['details', 'delivery', 'sizeguide', 'care', 'faq']) : new Set()
+  )
+  const [openFaqs, setOpenFaqs] = useState<Set<number>>(
+    variant === 'b' ? new Set([0, 1, 2, 3]) : new Set()
+  )
   const [sessionData, setSessionData] = useState<SessionData>({
     variant,
     task1Start: null,
@@ -350,7 +399,31 @@ function TaskPageInner() {
               Classic Oversized Tee
             </h1>
 
-            <p className="font-serif text-[22px] font-light text-dark mb-4">£45.00</p>
+            {variant === 'b' ? (
+              <div className="flex items-center gap-3 mb-3">
+                <p className="font-serif text-[22px] font-light text-dark">£45.00</p>
+                <span className="font-sans text-[10px] px-2 py-0.5 tracking-wide" style={{ backgroundColor: '#D1FAE5', color: '#065F46' }}>Free delivery</span>
+                <span className="font-sans text-[10px] px-2 py-0.5 tracking-wide" style={{ backgroundColor: '#DBEAFE', color: '#1E40AF' }}>Sustainable</span>
+              </div>
+            ) : (
+              <p className="font-serif text-[22px] font-light text-dark mb-4">£45.00</p>
+            )}
+
+            {variant === 'b' && (
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex gap-0.5">
+                  {([1, 2, 3, 4] as number[]).map((i) => (
+                    <svg key={i} className="w-3.5 h-3.5" fill="var(--accent)" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="var(--accent)" strokeWidth="1.5" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                </div>
+                <span className="font-sans text-[11px]" style={{ color: 'var(--mid)' }}>4.2 · 1,240 reviews</span>
+              </div>
+            )}
 
             <hr className="border-light mb-4" />
 
@@ -360,12 +433,7 @@ function TaskPageInner() {
                 Colour&nbsp;<span className="text-dark normal-case tracking-normal">{selectedColour}</span>
               </p>
               <div className="flex gap-2">
-                {([
-                  { name: 'Black', hex: '#191917' },
-                  { name: 'Stone', hex: '#C8C4BA' },
-                  { name: 'Sage',  hex: '#8AB87A' },
-                  { name: 'Sky',   hex: '#7AAAD4' },
-                ] as { name: string; hex: string }[]).map(({ name, hex }) => (
+                {COLOURS.map(({ name, hex }) => (
                   <button
                     key={name}
                     aria-label={name}
@@ -379,15 +447,25 @@ function TaskPageInner() {
                   />
                 ))}
               </div>
+              {variant === 'b' && (
+                <div className="mt-2">
+                  <span className="font-sans text-[10px] border border-light text-mid px-2 py-0.5 tracking-wide inline-block">Material: 100% Organic Cotton</span>
+                </div>
+              )}
             </div>
 
             <hr className="border-light mb-4" />
 
             {/* Size */}
             <div className="mb-4">
-              <p className="font-sans text-[11px] uppercase tracking-wider text-mid mb-2">Size</p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="font-sans text-[11px] uppercase tracking-wider text-mid">Size</p>
+                {variant === 'b' && (
+                  <a href="#" onClick={track} className="font-sans text-[11px] text-mid underline underline-offset-2 hover:text-dark transition-colors">Size guide</a>
+                )}
+              </div>
               <div className="flex gap-2">
-                {(['XS', 'S', 'M', 'L', 'XL'] as string[]).map((size) => {
+                {SIZES.map((size) => {
                   const disabled = size === 'XS' || size === 'XL'
                   const active = selectedSize === size
                   return (
@@ -433,16 +511,32 @@ function TaskPageInner() {
               Save to wishlist
             </button>
 
-            {/* Description — quick summary strip */}
-            <div className="bg-lighter p-4 mb-1">
-              <p className="font-sans text-[12px] text-mid leading-relaxed">
-                100% organic cotton. Relaxed oversized fit. Model is 5ft 10 wearing size S.
-                Machine wash cold.{' '}
-                <span className="text-brand-green">
-                  Free returns within 30 days.
-                </span>
-              </p>
-            </div>
+            {/* Description / meta strip */}
+            {variant === 'b' ? (
+              <div className="border border-light mb-1">
+                <div className="grid grid-cols-3 divide-x divide-light">
+                  <div className="flex flex-col items-center justify-center text-center px-3 py-3">
+                    <span className="font-sans text-[11px] text-dark">Dispatches in 1–2 days</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center text-center px-3 py-3">
+                    <span className="font-sans text-[11px] text-brand-green">Free 30-day returns</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center text-center px-3 py-3">
+                    <span className="font-sans text-[11px] text-dark">Earn 45 reward points</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-lighter p-4 mb-1">
+                <p className="font-sans text-[12px] text-mid leading-relaxed">
+                  100% organic cotton. Relaxed oversized fit. Model is 5ft 10 wearing size S.
+                  Machine wash cold.{' '}
+                  <span className="text-brand-green">
+                    Free returns within 30 days.
+                  </span>
+                </p>
+              </div>
+            )}
 
             {/* ── Accordion sections ── */}
             <div className="border-t border-light mt-4">
@@ -597,16 +691,11 @@ function TaskPageInner() {
 
             </div>
 
-            {/* ── You may also like ── */}
+            {/* You may also like */}
             <div className="mt-8 pb-8">
               <p className="font-sans text-[10px] uppercase tracking-[0.18em] text-mid mb-4">You may also like</p>
               <div className="grid grid-cols-2 gap-3">
-                {([
-                  { name: 'Classic Crew Neck Sweatshirt', price: '£65.00' },
-                  { name: 'Relaxed Fit Chino',            price: '£85.00' },
-                  { name: 'Organic Cotton Hoodie',        price: '£95.00' },
-                  { name: 'Wide Leg Trouser',             price: '£75.00' },
-                ] as { name: string; price: string }[]).map((p) => (
+                {RELATED_PRODUCTS.map((p) => (
                   <div key={p.name} className="border border-light cursor-pointer group">
                     <div className="w-full flex items-center justify-center" style={{ height: '120px', backgroundColor: '#E8E2D9' }} />
                     <div className="p-3">
@@ -617,6 +706,88 @@ function TaskPageInner() {
                 ))}
               </div>
             </div>
+
+            {variant === 'b' && (
+              <div className="mt-8 pb-4">
+                <p className="font-sans text-[10px] uppercase tracking-[0.18em] text-mid mb-4">Customer reviews</p>
+
+                <div className="flex gap-6 mb-6">
+                  <div className="flex flex-col items-center flex-shrink-0">
+                    <span className="font-serif text-[48px] font-light text-dark leading-none">4.2</span>
+                    <div className="flex gap-0.5 mt-1">
+                      {[1, 2, 3, 4].map((i) => (
+                        <svg key={i} className="w-3.5 h-3.5" fill="var(--accent)" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="var(--accent)" strokeWidth="1.5" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </div>
+                    <span className="font-sans text-[10px] text-mid mt-1">1,240 reviews</span>
+                  </div>
+
+                  <div className="flex-1 flex flex-col gap-1.5 justify-center">
+                    {RATING_BARS.map(({ label, pct }) => (
+                      <div key={label} className="flex items-center gap-2">
+                        <span className="font-sans text-[10px] text-mid w-8 flex-shrink-0">{label}</span>
+                        <div className="flex-1 h-1.5 bg-light overflow-hidden">
+                          <div className="h-full bg-accent" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="font-sans text-[10px] text-mid w-7 text-right">{pct}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {REVIEWS.map((review, i) => (
+                  <div key={i} className="border-t border-light py-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: 5 }).map((_, j) => (
+                          <svg key={j} className="w-3 h-3" fill={j < review.stars ? 'var(--accent)' : 'none'} stroke="var(--accent)" strokeWidth={j < review.stars ? 0 : 1.5} viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ))}
+                      </div>
+                      {review.verified && (
+                        <span className="font-sans text-[10px] text-brand-green tracking-wide">✓ Verified purchase</span>
+                      )}
+                      <span className="font-sans text-[10px] text-mid ml-auto">{review.name}</span>
+                    </div>
+                    <p className="font-sans text-[12px] text-dark font-medium mb-1">{review.title}</p>
+                    <p className="font-sans text-[12px] text-mid leading-relaxed mb-3">{review.body}</p>
+                    <div className="flex items-center gap-4">
+                      <span className="font-sans text-[11px] text-mid">Helpful ({review.helpful})</span>
+                      <span className="font-sans text-[11px] text-mid">{review.date}</span>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="grid grid-cols-3 gap-2 mt-4 pb-4">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="w-full aspect-square" style={{ backgroundColor: '#E8E2D9' }} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {variant === 'b' && (
+              <div className="mt-8 pb-8">
+                <p className="font-sans text-[10px] uppercase tracking-[0.18em] text-mid mb-4">Recently viewed</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {RELATED_PRODUCTS.map((p) => (
+                    <div key={p.name} className="border border-light cursor-pointer group">
+                      <div className="w-full flex items-center justify-center" style={{ height: '120px', backgroundColor: '#E8E2D9' }} />
+                      <div className="p-3">
+                        <p className="font-serif text-[14px] font-light text-dark leading-snug mb-1 group-hover:text-accent transition-colors">{p.name}</p>
+                        <p className="font-sans text-[12px] text-mid">{p.price}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
           </div>
         </div>
