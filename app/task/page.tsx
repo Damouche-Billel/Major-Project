@@ -102,6 +102,8 @@ function TaskPageInner() {
   const [taskCompleteVisible, setTaskCompleteVisible] = useState<boolean>(false)
   const [allDone, setAllDone] = useState<boolean>(false)
   const [basketError, setBasketError] = useState<boolean>(false)
+  const [showNewsletter, setShowNewsletter] = useState(false)
+  const [newsletterEmail, setNewsletterEmail] = useState('')
   const [openSections, setOpenSections] = useState<Set<string>>(
     variant === 'b' ? new Set(['details', 'delivery', 'sizeguide', 'care', 'faq']) : new Set()
   )
@@ -235,6 +237,16 @@ function TaskPageInner() {
     setSessionData((prev) => ({ ...prev, variant, task1Start: now }))
     setTaskStartTime(new Date(now))
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!sessionStorage.getItem('newsletterShown')) {
+        setShowNewsletter(true)
+        sessionStorage.setItem('newsletterShown', '1')
+      }
+    }, 8000)
+    return () => clearTimeout(timer)
   }, [])
 
   // Timer interval — resets whenever taskStartTime changes
@@ -679,7 +691,11 @@ function TaskPageInner() {
                           </button>
                           <div style={{ display: 'grid', gridTemplateRows: openFaqs.has(i) ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease' }}>
                             <div style={{ overflow: 'hidden' }}>
-                              <p className="font-sans text-[12px] text-mid leading-relaxed pb-3 pr-6">{item.a}</p>
+                              <p
+                                className="font-sans text-[12px] text-mid leading-relaxed pb-3 pr-6"
+                                onClick={i === 2 ? handleGiftWrapClick : undefined}
+                                style={i === 2 && currentTask === 1 ? { cursor: 'pointer' } : undefined}
+                              >{item.a}</p>
                             </div>
                           </div>
                         </div>
@@ -792,6 +808,45 @@ function TaskPageInner() {
           </div>
         </div>
       </div>
+      {showNewsletter && (
+        <div
+          className="fixed inset-0 flex items-center justify-center"
+          style={{ backgroundColor: 'rgba(25,25,23,0.6)', zIndex: 9999 }}
+          onClick={() => setShowNewsletter(false)}
+        >
+          <div
+            className="bg-white w-full max-w-[400px] mx-4 px-8 py-8 flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="font-serif text-[13px] tracking-[0.25em] text-mid mb-5">MINIMALIST</p>
+            <h2 className="font-serif text-[26px] font-light text-dark text-center leading-tight mb-2">
+              Get 10% off your first order
+            </h2>
+            <p className="font-sans text-[12px] text-mid text-center leading-relaxed mb-6">
+              Join our list for exclusive offers and new arrivals
+            </p>
+            <input
+              type="email"
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
+              placeholder="Your email address"
+              className="w-full border border-light px-3 py-2.5 font-sans text-[13px] text-dark focus:outline-none focus:border-accent transition-colors mb-3"
+            />
+            <button
+              onClick={() => setShowNewsletter(false)}
+              className="w-full bg-dark text-white font-sans text-[11px] uppercase tracking-[0.15em] py-3.5 hover:bg-accent transition-colors mb-4"
+            >
+              Subscribe
+            </button>
+            <button
+              onClick={() => setShowNewsletter(false)}
+              className="font-sans text-[11px] text-mid hover:text-dark transition-colors underline underline-offset-2"
+            >
+              No thanks
+            </button>
+          </div>
+        </div>
+      )}
     </>
   )
 }
