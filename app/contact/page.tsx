@@ -135,7 +135,6 @@ function ContactPageInner() {
             style={{ maxWidth: '860px', gridTemplateColumns: '1fr 1fr' }}
           >
 
-            {/* ── Left: info blocks ── */}
             <div className="flex flex-col gap-8">
 
               <div>
@@ -181,7 +180,6 @@ function ContactPageInner() {
 
             </div>
 
-            {/* ── Right: contact form ── */}
             <div className="flex flex-col gap-5">
 
               <div>

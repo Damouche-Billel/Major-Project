@@ -49,11 +49,25 @@ function SurveyPageInner() {
 
   function handleSubmit() {
     if (!allAnswered) return
-    const responses = {
-      likert: LIKERT_QUESTIONS.map((q, i) => ({ meta: q.meta, value: likert[i] })),
-      openText,
-    }
-    console.log('Survey responses:', responses)
+
+    const participant = (() => {
+      try { return JSON.parse(localStorage.getItem('participantData') ?? '{}') } catch { return {} }
+    })()
+    const session = (() => {
+      try { return JSON.parse(sessionStorage.getItem('sessionData') ?? '{}') } catch { return {} }
+    })()
+
+    fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...participant,
+        ...session,
+        likert: likert as number[],
+        openText,
+      }),
+    }).catch(console.error)
+
     router.push('/complete')
   }
 

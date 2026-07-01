@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS sessions (
+  id                     INTEGER PRIMARY KEY AUTOINCREMENT,
+  participant_id         TEXT,
+  age_range              TEXT,
+  shopping_frequency     TEXT,
+  variant                TEXT NOT NULL,
+  task1_ms               INTEGER,
+  task2_ms               INTEGER,
+  task3_ms               INTEGER,
+  task4_ms               INTEGER,
+  total_clicks           INTEGER,
+  error_clicks           INTEGER,
+  size_changes           INTEGER,
+  colour_changes         INTEGER,
+  q1_perceived_usefulness INTEGER,
+  q2_ease_of_use         INTEGER,
+  q3_trust               INTEGER,
+  q4_purchase_intent     INTEGER,
+  open_text              TEXT,
+  submitted_at           TEXT
+);

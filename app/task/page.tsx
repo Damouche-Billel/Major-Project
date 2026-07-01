@@ -13,7 +13,6 @@ const NAV_LINKS = [
   { label: 'Sale', href: '/sale' },
 ]
 
-// Three local product images — same photos across all colour swatches
 const PRODUCT_IMAGES: [string, string, string] = [
   '/images/black-oversized-1.png',
   '/images/black-oversized-2.png',
@@ -127,7 +126,6 @@ function TaskPageInner() {
   })
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // ── Helpers ──────────────────────────────────────────────
   function track() {
     setSessionData((prev) => ({ ...prev, totalClicks: prev.totalClicks + 1 }))
   }
@@ -226,8 +224,6 @@ function TaskPageInner() {
     track()
   }
 
-  // ── Effects ───────────────────────────────────────────────
-  // Load participant data and record task1Start on mount
   useEffect(() => {
     const raw = localStorage.getItem('participantData')
     if (raw) {
@@ -249,7 +245,6 @@ function TaskPageInner() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Timer interval — resets whenever taskStartTime changes
   useEffect(() => {
     if (!taskStartTime) return
     setElapsed(0)
@@ -261,12 +256,10 @@ function TaskPageInner() {
 
   const task = TASKS[currentTask - 1]
 
-  // ── Render ────────────────────────────────────────────────
   return (
     <>
       <Nav links={NAV_LINKS} activeLink="Women" />
 
-      {/* Everything below the nav fills the remaining viewport height */}
       <div className="flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 54px)' }}>
 
         {/* Task progress bar */}
@@ -351,10 +344,8 @@ function TaskPageInner() {
           </p>
         </div>
 
-        {/* Two-column product grid — flex-1 fills all remaining height */}
         <div className="grid flex-1 overflow-hidden" style={{ gridTemplateColumns: '1fr 1fr' }}>
 
-          {/* ── LEFT: Image panel ── */}
           <div className="bg-lighter border-r border-light flex overflow-hidden" style={{ padding: '28px' }}>
             {/* Thumbnails */}
             <div className="flex flex-col gap-2 mr-4 flex-shrink-0">
@@ -400,7 +391,6 @@ function TaskPageInner() {
             </div>
           </div>
 
-          {/* ── RIGHT: Product details panel ── */}
           <div className="bg-white overflow-y-auto" style={{ padding: '28px' }}>
 
             <p className="font-sans text-[10px] uppercase tracking-[0.15em] text-mid mb-3">
