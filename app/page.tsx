@@ -53,7 +53,6 @@ function HomeInner() {
       <main className="min-h-[calc(100vh-54px)] flex items-center justify-center px-4">
         <div className="w-full max-w-[460px] bg-white border border-light">
 
-          {/* Card header */}
           <div className="px-8 pt-8 pb-6 border-b border-light">
             <p className="font-sans text-[11px] uppercase tracking-[0.15em] text-accent mb-3">
               Step 1 of 3
@@ -66,10 +65,8 @@ function HomeInner() {
             </p>
           </div>
 
-          {/* Card body */}
           <div className="px-8 py-7 space-y-6">
 
-            {/* Info strip */}
             <div className="border-l-2 border-accent bg-lighter pl-4 pr-3 py-3">
               <p className="font-sans text-[12px] text-mid leading-relaxed">
                 This study takes{' '}
@@ -79,7 +76,6 @@ function HomeInner() {
               </p>
             </div>
 
-            {/* Two-column grid */}
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="font-sans text-[11px] uppercase tracking-wider text-mid">
@@ -113,7 +109,6 @@ function HomeInner() {
               </div>
             </div>
 
-            {/* Shopping frequency */}
             <div className="flex flex-col gap-1.5">
               <label className="font-sans text-[11px] uppercase tracking-wider text-mid">
                 Shopping frequency
@@ -131,7 +126,6 @@ function HomeInner() {
               </select>
             </div>
 
-            {/* Continue button */}
             <button
               onClick={handleContinue}
               className="w-full bg-dark text-white font-sans text-[11px] uppercase tracking-[0.15em] py-3.5 hover:bg-accent transition-colors"
@@ -139,7 +133,6 @@ function HomeInner() {
               Continue
             </button>
 
-            {/* Consent note */}
             <p className="font-sans text-[11px] text-mid text-center leading-relaxed">
               By continuing you confirm that you are aged 18 or above and consent
               to your anonymised responses being used for academic research purposes.

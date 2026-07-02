@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import Image from 'next/image'
 import Nav from '@/components/Nav'
 import type { SessionData } from '@/types'
 
@@ -24,7 +25,6 @@ function WishlistPageInner() {
   const [sessionData, setSessionData] = useState<SessionData | null>(null)
   const [taskCompleteVisible, setTaskCompleteVisible] = useState<boolean>(true)
 
-  // On mount: read sessionData, stamp task3Start, save back
   useEffect(() => {
     const raw = sessionStorage.getItem('sessionData')
     if (raw) {
@@ -105,20 +105,17 @@ function WishlistPageInner() {
 
           {/* Wishlist item card */}
           <div className="flex items-start gap-5 border border-light p-5 max-w-lg">
-            {/* Image placeholder */}
+            {/* Product image */}
             <div
-              className="flex-shrink-0 flex items-center justify-center"
-              style={{
-                width: '72px',
-                height: '88px',
-                backgroundColor: '#E8E2D9',
-                fontSize: '22px',
-                fontFamily: 'var(--font-serif)',
-                color: 'var(--mid)',
-                fontWeight: 300,
-              }}
+              className="flex-shrink-0 relative"
+              style={{ width: '72px', height: '88px' }}
             >
-              M
+              <Image
+                src="/images/black-oversized-1.png"
+                alt="Classic Oversized Tee"
+                fill
+                className="object-cover"
+              />
             </div>
 
             {/* Details */}

@@ -74,10 +74,16 @@ const REVIEWS = [
 ]
 
 const RELATED_PRODUCTS = [
-  { name: 'Classic Crew Neck Sweatshirt', price: '£65.00' },
-  { name: 'Relaxed Fit Chino',            price: '£85.00' },
-  { name: 'Organic Cotton Hoodie',        price: '£95.00' },
-  { name: 'Wide Leg Trouser',             price: '£75.00' },
+  { name: 'Classic Crew Neck Sweatshirt', price: '£65.00', image: '/images/sweatshirt.jpg' },
+  { name: 'Relaxed Fit Chino',            price: '£85.00', image: '/images/chino.jpg' },
+  { name: 'Organic Cotton Hoodie',        price: '£95.00', image: '/images/hoodie.jpg' },
+  { name: 'Wide Leg Trouser',             price: '£75.00', image: '/images/wide-leg-trouser.jpg' },
+]
+
+const REVIEW_PHOTOS = [
+  '/images/review-1.jpg',
+  '/images/review-2.jpg',
+  '/images/review-3.jpg',
 ]
 
 function formatElapsed(seconds: number): string {
@@ -94,13 +100,13 @@ function TaskPageInner() {
   const [participantData, setParticipantData] = useState<ParticipantData | null>(null)
   const [currentTask, setCurrentTask] = useState<number>(1)
   const [taskStartTime, setTaskStartTime] = useState<Date | null>(null)
-  const [elapsed, setElapsed] = useState<number>(0)
+  const [elapsed, setElapsed] = useState(0)
   const [activeThumb, setActiveThumb] = useState<number>(0)
-  const [selectedColour, setSelectedColour] = useState<string>('Black')
+  const [selectedColour, setSelectedColour] = useState('Black')
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [taskCompleteVisible, setTaskCompleteVisible] = useState<boolean>(false)
   const [allDone, setAllDone] = useState<boolean>(false)
-  const [basketError, setBasketError] = useState<boolean>(false)
+  const [basketError, setBasketError] = useState(false)
   const [showNewsletter, setShowNewsletter] = useState(false)
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const [openSections, setOpenSections] = useState<Set<string>>(
@@ -125,6 +131,7 @@ function TaskPageInner() {
     colourChanges: 0,
   })
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   function track() {
     setSessionData((prev) => ({ ...prev, totalClicks: prev.totalClicks + 1 }))
@@ -149,6 +156,10 @@ function TaskPageInner() {
 
   function advanceTask(completedTask: number) {
     const now = Date.now()
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
     const endKey = `task${completedTask}End` as keyof SessionData
     if (completedTask === TOTAL_TASKS) {
       setSessionData((prev) => {
@@ -200,6 +211,13 @@ function TaskPageInner() {
   }
 
   function handleNextTask() {
+    setActiveThumb(0)
+    setSelectedColour('Black')
+    setSelectedSize('')
+    setBasketError(false)
+    setOpenSections(variant === 'b' ? new Set(['details', 'delivery', 'sizeguide', 'care', 'faq']) : new Set())
+    setOpenFaqs(variant === 'b' ? new Set([0, 1, 2, 3]) : new Set())
+    if (scrollRef.current) scrollRef.current.scrollTop = 0
     setTaskCompleteVisible(false)
     setTaskStartTime(new Date())
   }
@@ -236,6 +254,7 @@ function TaskPageInner() {
   }, [])
 
   useEffect(() => {
+    if (variant !== 'b') return
     const timer = setTimeout(() => {
       if (!sessionStorage.getItem('newsletterShown')) {
         setShowNewsletter(true)
@@ -243,7 +262,7 @@ function TaskPageInner() {
       }
     }, 8000)
     return () => clearTimeout(timer)
-  }, [])
+  }, [variant])
 
   useEffect(() => {
     if (!taskStartTime) return
@@ -262,7 +281,6 @@ function TaskPageInner() {
 
       <div className="flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 54px)' }}>
 
-        {/* Task progress bar */}
         <div className="flex w-full h-[3px] flex-shrink-0">
           {TASKS.map((t) => {
             const isCompleted = allDone || t.number < currentTask
@@ -278,7 +296,6 @@ function TaskPageInner() {
           })}
         </div>
 
-        {/* Task banner — hidden when all tasks complete */}
         {!allDone && (
           <div className="w-full bg-dark flex items-stretch min-h-[72px] flex-shrink-0">
             <div className="flex-1 flex flex-col justify-center px-8 py-4 border-r border-white/10">
@@ -303,7 +320,6 @@ function TaskPageInner() {
           </div>
         )}
 
-        {/* Task complete bar (tasks 1–3) */}
         {taskCompleteVisible && (
           <div className="w-full bg-brand-green flex items-center justify-between px-8 py-3 flex-shrink-0">
             <span className="font-sans text-[12px] uppercase tracking-[0.12em] text-white">
@@ -318,7 +334,6 @@ function TaskPageInner() {
           </div>
         )}
 
-        {/* All tasks complete bar */}
         {allDone && (
           <div className="w-full bg-brand-green flex items-center justify-between px-8 py-3 flex-shrink-0">
             <span className="font-sans text-[12px] uppercase tracking-[0.12em] text-white">
@@ -333,7 +348,6 @@ function TaskPageInner() {
           </div>
         )}
 
-        {/* Breadcrumb bar */}
         <div className="w-full bg-white border-b border-light px-8 py-2.5 flex-shrink-0">
           <p className="font-sans text-[11px] text-mid tracking-wide">
             <span className="hover:text-dark cursor-pointer transition-colors">Women</span>
@@ -347,7 +361,6 @@ function TaskPageInner() {
         <div className="grid flex-1 overflow-hidden" style={{ gridTemplateColumns: '1fr 1fr' }}>
 
           <div className="bg-lighter border-r border-light flex overflow-hidden" style={{ padding: '28px' }}>
-            {/* Thumbnails */}
             <div className="flex flex-col gap-2 mr-4 flex-shrink-0">
               {([0, 1, 2] as const).map((i) => (
                 <button
@@ -371,7 +384,6 @@ function TaskPageInner() {
               ))}
             </div>
 
-            {/* Main image */}
             <div className="relative flex-1 overflow-hidden">
               <Image
                 src={COLOUR_IMAGES[selectedColour][activeThumb]}
@@ -391,7 +403,7 @@ function TaskPageInner() {
             </div>
           </div>
 
-          <div className="bg-white overflow-y-auto" style={{ padding: '28px' }}>
+          <div ref={scrollRef} className="bg-white overflow-y-auto" style={{ padding: '28px' }}>
 
             <p className="font-sans text-[10px] uppercase tracking-[0.15em] text-mid mb-3">
               Minimalist / Essentials
@@ -429,7 +441,6 @@ function TaskPageInner() {
 
             <hr className="border-light mb-4" />
 
-            {/* Colour */}
             <div className="mb-4">
               <p className="font-sans text-[11px] uppercase tracking-wider text-mid mb-2">
                 Colour&nbsp;<span className="text-dark normal-case tracking-normal">{selectedColour}</span>
@@ -458,7 +469,6 @@ function TaskPageInner() {
 
             <hr className="border-light mb-4" />
 
-            {/* Size */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
                 <p className="font-sans text-[11px] uppercase tracking-wider text-mid">Size</p>
@@ -492,7 +502,6 @@ function TaskPageInner() {
 
             <hr className="border-light mb-4" />
 
-            {/* Add to basket */}
             <button
               onClick={handleAddToBasket}
               className="w-full bg-dark text-white font-sans text-[11px] uppercase tracking-[0.15em] py-3.5 hover:bg-accent transition-colors mb-2"
@@ -505,7 +514,6 @@ function TaskPageInner() {
               </p>
             )}
 
-            {/* Save to wishlist */}
             <button
               onClick={handleSaveToWishlist}
               className="w-full border border-dark text-dark font-sans text-[11px] uppercase tracking-[0.15em] py-3.5 hover:bg-dark hover:text-white transition-colors mb-5"
@@ -513,7 +521,6 @@ function TaskPageInner() {
               Save to wishlist
             </button>
 
-            {/* Description / meta strip */}
             {variant === 'b' ? (
               <div className="border border-light mb-1">
                 <div className="grid grid-cols-3 divide-x divide-light">
@@ -540,10 +547,8 @@ function TaskPageInner() {
               </div>
             )}
 
-            {/* ── Accordion sections ── */}
             <div className="border-t border-light mt-4">
 
-              {/* 1 — Product details */}
               <div className="border-b border-light">
                 <button
                   onClick={() => toggleSection('details')}
@@ -566,7 +571,6 @@ function TaskPageInner() {
                 </div>
               </div>
 
-              {/* 2 — Delivery and returns */}
               <div className="border-b border-light">
                 <button
                   onClick={() => toggleSection('delivery')}
@@ -593,7 +597,6 @@ function TaskPageInner() {
                 </div>
               </div>
 
-              {/* 3 — Size guide */}
               <div className="border-b border-light">
                 <button
                   onClick={() => toggleSection('sizeguide')}
@@ -633,7 +636,6 @@ function TaskPageInner() {
                 </div>
               </div>
 
-              {/* 4 — Care */}
               <div className="border-b border-light">
                 <button
                   onClick={() => toggleSection('care')}
@@ -653,7 +655,6 @@ function TaskPageInner() {
                 </div>
               </div>
 
-              {/* 5 — FAQ */}
               <div className="border-b border-light">
                 <button
                   onClick={() => toggleSection('faq')}
@@ -703,7 +704,9 @@ function TaskPageInner() {
               <div className="grid grid-cols-2 gap-3">
                 {RELATED_PRODUCTS.map((p) => (
                   <div key={p.name} className="border border-light cursor-pointer group">
-                    <div className="w-full flex items-center justify-center" style={{ height: '120px', backgroundColor: '#E8E2D9' }} />
+                    <div className="w-full relative" style={{ height: '120px' }}>
+                      <Image src={p.image} alt={p.name} fill className="object-cover" />
+                    </div>
                     <div className="p-3">
                       <p className="font-serif text-[14px] font-light text-dark leading-snug mb-1 group-hover:text-accent transition-colors">{p.name}</p>
                       <p className="font-sans text-[12px] text-mid">{p.price}</p>
@@ -771,8 +774,10 @@ function TaskPageInner() {
                 ))}
 
                 <div className="grid grid-cols-3 gap-2 mt-4 pb-4">
-                  {[0, 1, 2].map((i) => (
-                    <div key={i} className="w-full aspect-square" style={{ backgroundColor: '#E8E2D9' }} />
+                  {REVIEW_PHOTOS.map((src, i) => (
+                    <div key={i} className="w-full aspect-square relative">
+                      <Image src={src} alt={`Customer photo ${i + 1}`} fill className="object-cover" />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -784,7 +789,9 @@ function TaskPageInner() {
                 <div className="grid grid-cols-2 gap-3">
                   {RELATED_PRODUCTS.map((p) => (
                     <div key={p.name} className="border border-light cursor-pointer group">
-                      <div className="w-full flex items-center justify-center" style={{ height: '120px', backgroundColor: '#E8E2D9' }} />
+                      <div className="w-full relative" style={{ height: '120px' }}>
+                        <Image src={p.image} alt={p.name} fill className="object-cover" />
+                      </div>
                       <div className="p-3">
                         <p className="font-serif text-[14px] font-light text-dark leading-snug mb-1 group-hover:text-accent transition-colors">{p.name}</p>
                         <p className="font-sans text-[12px] text-mid">{p.price}</p>
