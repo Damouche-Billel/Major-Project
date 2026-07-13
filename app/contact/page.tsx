@@ -30,7 +30,6 @@ function ContactPageInner() {
   const [message, setMessage] = useState('')
   const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({})
 
-  // On mount: read sessionData, stamp task4Start, save back
   useEffect(() => {
     const raw = sessionStorage.getItem('sessionData')
     if (raw) {
