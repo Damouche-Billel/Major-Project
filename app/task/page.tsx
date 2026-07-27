@@ -109,12 +109,8 @@ function TaskPageInner() {
   const [basketError, setBasketError] = useState(false)
   const [showNewsletter, setShowNewsletter] = useState(false)
   const [newsletterEmail, setNewsletterEmail] = useState('')
-  const [openSections, setOpenSections] = useState<Set<string>>(
-    variant === 'b' ? new Set(['details', 'delivery', 'sizeguide', 'care', 'faq']) : new Set()
-  )
-  const [openFaqs, setOpenFaqs] = useState<Set<number>>(
-    variant === 'b' ? new Set([0, 1, 2, 3]) : new Set()
-  )
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set())
+  const [openFaqs, setOpenFaqs] = useState<Set<number>>(new Set())
   const [sessionData, setSessionData] = useState<SessionData>({
     variant,
     task1Start: null,
@@ -181,26 +177,42 @@ function TaskPageInner() {
   }
 
   function handleGiftWrapClick() {
-    if (currentTask !== 1) return
+    if (currentTask !== 1) {
+      setSessionData((prev) => ({ ...prev, errorClicks: prev.errorClicks + 1 }))
+      return
+    }
+    if (taskCompleteVisible) return
     track()
     advanceTask(1)
   }
 
   function handleSaleReturnClick() {
-    if (currentTask !== 2) return
+    if (currentTask !== 2) {
+      setSessionData((prev) => ({ ...prev, errorClicks: prev.errorClicks + 1 }))
+      return
+    }
+    if (taskCompleteVisible) return
     track()
     advanceTask(2)
   }
 
   function handleModelSizingClick() {
-    if (currentTask !== 3) return
+    if (currentTask !== 3) {
+      setSessionData((prev) => ({ ...prev, errorClicks: prev.errorClicks + 1 }))
+      return
+    }
+    if (taskCompleteVisible) return
     track()
     advanceTask(3)
   }
 
   function handleAddToBasket() {
+    if (currentTask !== 4) {
+      setSessionData((prev) => ({ ...prev, errorClicks: prev.errorClicks + 1 }))
+      return
+    }
+    if (taskCompleteVisible) return
     track()
-    if (currentTask !== 4) return
     if (selectedColour !== 'Stone' || selectedSize !== 'M') {
       setSessionData((prev) => ({ ...prev, errorClicks: prev.errorClicks + 1 }))
       setBasketError(true)
@@ -215,8 +227,8 @@ function TaskPageInner() {
     setSelectedColour('Black')
     setSelectedSize('')
     setBasketError(false)
-    setOpenSections(variant === 'b' ? new Set(['details', 'delivery', 'sizeguide', 'care', 'faq']) : new Set())
-    setOpenFaqs(variant === 'b' ? new Set([0, 1, 2, 3]) : new Set())
+    setOpenSections(new Set())
+    setOpenFaqs(new Set())
     if (scrollRef.current) scrollRef.current.scrollTop = 0
     setTaskCompleteVisible(false)
     setTaskStartTime(new Date())
