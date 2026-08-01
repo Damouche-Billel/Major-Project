@@ -22,15 +22,15 @@ export async function POST(req: NextRequest) {
       openText,
     } = body
 
-    const task1Time = task1Start && task1End ? task1End - task1Start : null
-    const task2Time = task2Start && task2End ? task2End - task2Start : null
-    const task3Time = task3Start && task3End ? task3End - task3Start : null
-    const task4Time = task4Start && task4End ? task4End - task4Start : null
+    const task1Time = task1Start && task1End ? Math.round((task1End - task1Start) / 1000) : null
+    const task2Time = task2Start && task2End ? Math.round((task2End - task2Start) / 1000) : null
+    const task3Time = task3Start && task3End ? Math.round((task3End - task3Start) / 1000) : null
+    const task4Time = task4Start && task4End ? Math.round((task4End - task4Start) / 1000) : null
 
     await db.execute({
       sql: `INSERT INTO sessions (
         participant_id, age_range, shopping_frequency, variant,
-        task1_ms, task2_ms, task3_ms, task4_ms,
+        task1_s, task2_s, task3_s, task4_s,
         total_clicks, error_clicks, size_changes, colour_changes,
         q1_perceived_usefulness, q2_ease_of_use, q3_trust, q4_purchase_intent,
         open_text, submitted_at
